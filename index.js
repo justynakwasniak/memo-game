@@ -14,39 +14,58 @@ document.addEventListener("DOMContentLoaded", () => {
     { name: "hotdog", img: "hotdog.png" },
   ];
 
-  // Pomieszanie kart
-  cardArray.sort(() => 0.5 - Math.random());
-
-  const grid = document.querySelector(".grid");
-  const resultDisplay = document.querySelector("#result");
   let cardsChosen = [];
   let cardsChosenIds = [];
   let cardsWon = [];
+  let timer;
+  let timeElapsed = 0;
 
-  // Stworzenie planszy
+  const grid = document.querySelector(".grid");
+  const resultDisplay = document.querySelector("#result");
+  const timerDisplay = document.querySelector("#timer");
+  
+
+  function shuffleCards() {
+    return cardArray.sort(() => 0.5 - Math.random());
+  }
+
+
+  function startTimer() {
+    timer = setInterval(() => {
+      timeElapsed++;
+      timerDisplay.textContent = `Time: ${timeElapsed} seconds`;
+    }, 1000);
+  }
+
+
   function createBoard() {
-    for (let i = 0; i < cardArray.length; i++) {
+    grid.innerHTML = ''; 
+    const shuffledCards = shuffleCards();
+    
+    for (let i = 0; i < shuffledCards.length; i++) {
       const card = document.createElement("img");
-      card.setAttribute("src", "blank.png"); // Ustawienie obrazka początkowego
+      card.setAttribute("src", "blank.png");
       card.setAttribute("data-id", i);
       card.addEventListener("click", flipCard);
       grid.appendChild(card);
     }
+    
+    startTimer(); 
   }
 
-  // Funkcja odkrywająca karty
+
   function flipCard() {
     const cardId = this.getAttribute("data-id");
     cardsChosen.push(cardArray[cardId].name);
     cardsChosenIds.push(cardId);
-    this.setAttribute("src", cardArray[cardId].img); // Ustawienie obrazka karty
+    this.setAttribute("src", cardArray[cardId].img);
 
     if (cardsChosen.length === 2) {
       setTimeout(checkForMatch, 500);
     }
   }
 
-  // Sprawdzanie dopasowania kart
+  // Check for matches
   function checkForMatch() {
     const cards = document.querySelectorAll("img");
     const [optionOneId, optionTwoId] = cardsChosenIds;
@@ -73,9 +92,33 @@ document.addEventListener("DOMContentLoaded", () => {
     resultDisplay.textContent = cardsWon.length;
 
     if (cardsWon.length === cardArray.length / 2) {
-      resultDisplay.textContent = "Congratulations! You have won!";
+      clearInterval(timer);
+      resultDisplay.textContent = `Congratulations! You have won in ${timeElapsed} seconds!`;
+      
+     
+      setTimeout(() => {
+        alert('Restarting game...');
+        resetGame();
+      }, 3000); 
     }
   }
 
-  createBoard();
+  
+  function resetGame() {
+    clearInterval(timer); 
+    timeElapsed = 0;
+    cardsWon = []; 
+    resultDisplay.textContent = ''; 
+    timerDisplay.textContent = 'Time: 0 seconds'; 
+    createBoard(); 
+  }
+
+ 
+  const restartButton = document.createElement('button');
+  restartButton.textContent = 'Restart Game';
+  restartButton.addEventListener('click', resetGame);
+  
+  document.body.appendChild(restartButton); 
+
+  createBoard(); 
 });

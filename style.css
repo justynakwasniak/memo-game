@@ -38,3 +38,16 @@ h3, h1 {
   font-size: x-large;
   color: #007bff;
 }
+button {
+  padding: 10px;
+  font-size: large;
+  background-color: palevioletred;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #d45d7a;
+}
